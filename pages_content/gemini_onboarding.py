@@ -13,13 +13,17 @@ def call_gemini(messages: list, system_prompt: str) -> str:
     """Call Gemini Flash via REST. Returns raw text response."""
     try:
         import urllib.request, json as _json
-        api_key = st.secrets.get("GEMINI_API_KEY", "")
+        try:
+            api_key = st.secrets["GEMINI_API_KEY"]
+        except Exception:
+            api_key = st.secrets.get("GEMINI_API_KEY", "")
+        api_key = str(api_key).strip()
         if not api_key:
             return "ERROR: GEMINI_API_KEY not found in st.secrets."
 
         url = (
             f"https://generativelanguage.googleapis.com/v1beta/models/"
-            f"gemini-2.0-flash:generateContent?key={api_key}"
+            f"gemini-1.5-flash:generateContent?key={api_key}"
         )
 
         # Build contents array from messages

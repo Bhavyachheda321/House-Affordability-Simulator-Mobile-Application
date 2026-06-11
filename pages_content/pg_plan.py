@@ -21,12 +21,18 @@ def ask_gemini_plan(question: str, plan_context: str) -> str:
     try:
         import urllib.request
         import json as _json
-        api_key = st.secrets.get("GEMINI_API_KEY", "")
+        # Read key — handle both dict-style and attribute-style secrets
+        try:
+            api_key = st.secrets["GEMINI_API_KEY"]
+        except Exception:
+            api_key = st.secrets.get("GEMINI_API_KEY", "")
+        api_key = str(api_key).strip()
         if not api_key:
             return "GEMINI_API_KEY not configured in Streamlit secrets."
+        # Use gemini-1.5-flash for broadest free-tier compatibility
         url = (
             "https://generativelanguage.googleapis.com/v1beta/models/"
-            f"gemini-2.0-flash:generateContent?key={api_key}"
+            f"gemini-1.5-flash:generateContent?key={api_key}"
         )
         prompt = (
             "You are a plain-language financial planning assistant for Indian investors. "
