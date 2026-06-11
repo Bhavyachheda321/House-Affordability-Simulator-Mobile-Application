@@ -7,9 +7,6 @@ API key is read from st.secrets.
 import json
 import re
 import streamlit as st
-from pages_content.calculations import (
-    CITY_PROPERTY_APPRECIATION, CITY_STAMP_DUTY, CITY_LIFESTYLE_INFLATION
-)
 
 # ── Gemini API call ───────────────────────────────────────────────────────────
 def call_gemini(messages: list, system_prompt: str) -> str:
@@ -210,12 +207,16 @@ def apply_confirmed_to_session(confirmed: dict):
                 st.session_state[ss_key] = val
             except (TypeError, ValueError):
                 pass
-    # Derive city-specific defaults
-    city = st.session_state.get("city", "Other")
-    if city in CITY_PROPERTY_APPRECIATION:
-        st.session_state["property_appr_rate"] = CITY_PROPERTY_APPRECIATION[city]
-    if city in CITY_LIFESTYLE_INFLATION:
-        st.session_state["lifestyle_inflation"] = CITY_LIFESTYLE_INFLATION[city]
+    # Derive city-specific defaults (lazy import to avoid Cloud import errors)
+    try:
+        from pages_content.calculations import CITY_PROPERTY_APPRECIATION, CITY_LIFESTYLE_INFLATION
+        city = st.session_state.get("city", "Other")
+        if city in CITY_PROPERTY_APPRECIATION:
+            st.session_state["property_appr_rate"] = CITY_PROPERTY_APPRECIATION[city]
+        if city in CITY_LIFESTYLE_INFLATION:
+            st.session_state["lifestyle_inflation"] = CITY_LIFESTYLE_INFLATION[city]
+    except Exception:
+        pass
 
 
 # ── Completeness check ────────────────────────────────────────────────────────

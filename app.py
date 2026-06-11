@@ -2,7 +2,15 @@
 FinPlan India v4
 Welcome screen → three entry modes → guided form → plan
 """
+import sys
+import os
 import streamlit as st
+
+# Ensure the app directory is on sys.path so pages_content imports work
+# on both Streamlit Cloud and local dev regardless of working directory.
+_app_dir = os.path.dirname(os.path.abspath(__file__))
+if _app_dir not in sys.path:
+    sys.path.insert(0, _app_dir)
 
 st.set_page_config(
     page_title="FinPlan India",
@@ -406,13 +414,18 @@ if mode == "welcome":
 
 # ── Chat / Gemini onboarding ──────────────────────────────────────────────────
 elif mode == "chat":
-    from pages_content import gemini_onboarding
     st.markdown("#### 🤖 Chat with FinPlan AI")
     st.caption("Answer in your own words — the AI fills in the form for you.")
     if st.button("← Choose a different mode"):
         st.session_state["mode"] = "welcome"
         st.rerun()
-    gemini_onboarding.render()
+    try:
+        from pages_content import gemini_onboarding
+        gemini_onboarding.render()
+    except Exception as _e:
+        import traceback
+        st.error(f"Chat error: {_e}")
+        st.code(traceback.format_exc())
 
 # ── Form / Expert mode ────────────────────────────────────────────────────────
 elif mode in ("form", "expert"):
@@ -439,20 +452,16 @@ elif mode in ("form", "expert"):
             st.session_state["step"] = 0
             st.rerun()
 
-    # Route to the right page
-    if step == 1:
-        pg_about.render()
-    elif step == 2:
-        pg_income.render()
-    elif step == 3:
-        pg_spending.render()
-    elif step == 4:
-        pg_assets.render()
-    elif step == 5:
-        pg_goals.render()
-    elif step == 6:
-        pg_plan.render()
+    # Route to the right page — wrapped so errors show instead of blank screen
+    page_map = {1: pg_about, 2: pg_income, 3: pg_spending,
+                4: pg_assets, 5: pg_goals, 6: pg_plan}
+    if step in page_map:
+        try:
+            page_map[step].render()
+        except Exception as _e:
+            import traceback
+            st.error(f"Page error on step {step}: {_e}")
+            st.code(traceback.format_exc())
     else:
-        # Fallback
         st.session_state["step"] = 1
         st.rerun()

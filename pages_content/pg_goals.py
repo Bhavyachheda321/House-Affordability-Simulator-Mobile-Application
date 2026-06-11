@@ -1,12 +1,13 @@
 """FinPlan India v4 — Step 5: Goals"""
 import streamlit as st
-from pages_content.calculations import (
-    CITY_PROPERTY_APPRECIATION, CITY_STAMP_DUTY,
-    goal_corpus_needed, goal_monthly_sip, emi_amount,
-)
 
 
 def render():
+    from pages_content.calculations import (
+        CITY_PROPERTY_APPRECIATION, CITY_STAMP_DUTY,
+        goal_corpus_needed, goal_monthly_sip, emi_amount,
+    )
+
     s = st.session_state
     infl = s.get("lifestyle_inflation", 7) / 100
 

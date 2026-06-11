@@ -1,12 +1,13 @@
 """FinPlan India v4 — Step 1: About You"""
 import streamlit as st
-from pages_content.calculations import (
-    CITY_PROPERTY_APPRECIATION, CITY_LIFESTYLE_INFLATION, CITY_STAMP_DUTY
-)
-from pages_content.tax_engine import effective_slab_rate_from_bracket
 
 
 def render():
+    from pages_content.calculations import (
+        CITY_PROPERTY_APPRECIATION, CITY_LIFESTYLE_INFLATION, CITY_STAMP_DUTY,
+    )
+    from pages_content.tax_engine import effective_slab_rate_from_bracket
+
     s = st.session_state
 
     st.markdown("#### 👤 About You")
